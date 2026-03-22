@@ -47,6 +47,13 @@ config :opencov, :demo,
   email: "user@opencov.com",
   password: "password123"
 
+config :opencov, :gitea,
+  enabled: System.get_env("GITEA_ENABLED") == "true",
+  url: System.get_env("GITEA_URL"),
+  token: System.get_env("GITEA_TOKEN"),
+  post_commit_status: true,
+  post_pr_comment: true
+
 import_config "#{Mix.env}.exs"
 
 local_config_path = Path.expand("local.exs", __DIR__)

@@ -34,6 +34,7 @@ defmodule Opencov.BuildManager do
     coverage = build |> Repo.preload(:jobs) |> compute_coverage
     build = Repo.update! change(build, coverage: coverage)
     Opencov.ProjectManager.update_coverage(Repo.preload(build, :project).project)
+    Opencov.Integrations.Gitea.notify(build)
     build
   end
 
