@@ -16,7 +16,7 @@ defmodule Opencov.Mixfile do
 
   def application do
     [mod: {Opencov, []},
-     extra_applications: [:logger, :eex]]
+     extra_applications: [:logger, :eex, :httpoison]]
   end
 
   defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
@@ -45,6 +45,7 @@ defmodule Opencov.Mixfile do
      {:secure_password, "~> 0.4"},
      {:seedex, "~> 0.1.3"},
      {:jason, "~> 1.2"},
+     {:httpoison, "~> 1.8"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:mix_test_watch, "~> 0.2", only: :dev},
      {:excoveralls, "~> 0.6", only: :test},
