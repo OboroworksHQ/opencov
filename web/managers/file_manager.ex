@@ -3,8 +3,8 @@ defmodule Opencov.FileManager do
   import Opencov.File
   alias Opencov.File
 
-  @required_fields ~w(name source coverage_lines)a
-  @optional_fields ~w(job_id)a
+  @required_fields ~w(name coverage_lines)a
+  @optional_fields ~w(job_id source)a
 
   def changeset(model, params \\ :invalid) do
     model
