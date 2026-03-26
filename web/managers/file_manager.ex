@@ -3,13 +3,12 @@ defmodule Opencov.FileManager do
   import Opencov.File
   alias Opencov.File
 
-  @required_fields ~w(name coverage_lines)a
-  @optional_fields_extra ~w(source)a
+  @required_fields ~w(name source coverage_lines)a
   @optional_fields ~w(job_id)a
 
   def changeset(model, params \\ :invalid) do
     model
-    |> cast(normalize_params(params), @required_fields ++ @optional_fields ++ @optional_fields_extra)
+    |> cast(normalize_params(params), @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
     |> generate_coverage
     |> prepare_changes(&set_previous_file/1)
@@ -17,9 +16,12 @@ defmodule Opencov.FileManager do
 
   defp normalize_params(%{"coverage" => coverage} = params) when is_list(coverage) do
     {lines, params} = Map.pop(params, "coverage")
-    Map.put(params, "coverage_lines", lines)
+    params |> Map.put("coverage_lines", lines) |> default_source()
   end
-  defp normalize_params(params), do: params
+  defp normalize_params(params), do: default_source(params)
+
+  defp default_source(%{"source" => source} = params) when is_binary(source) and byte_size(source) > 0, do: params
+  defp default_source(params), do: Map.put(params, "source", "(no source)")
 
   defp generate_coverage(changeset) do
     case get_change(changeset, :coverage_lines) do
