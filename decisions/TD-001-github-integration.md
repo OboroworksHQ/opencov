@@ -57,12 +57,17 @@ config :opencov, :github,
 
 ### Ansible repo (oboroworks-ansible)
 
+**Note**: the existing Gitea integration (`lib/opencov/integrations/gitea.ex`, merged on master since 2026-03-22) is also missing env var passthrough in the Ansible deployment. The `opencov` service in `docker-compose.yml.j2` has no `environment` section, so `GITEA_ENABLED`, `GITEA_URL`, `GITEA_TOKEN` are never set — making Gitea integration dead code in production. This TD fixes both Gitea and GitHub in one pass.
+
 #### 4. Modify: `roles/opencov/templates/docker-compose.yml.j2`
 
-Add `environment` section to `opencov` service:
+Add `environment` section to `opencov` service with both integrations:
 
 ```yaml
 environment:
+  - GITEA_ENABLED={{ opencov_gitea_enabled | default('false') }}
+  - GITEA_URL={{ opencov_gitea_url }}
+  - GITEA_TOKEN={{ opencov_gitea_token }}
   - GITHUB_ENABLED={{ opencov_github_enabled | default('false') }}
   - GITHUB_TOKEN={{ opencov_github_token }}
 ```
@@ -70,25 +75,30 @@ environment:
 #### 5. Modify: `roles/opencov/vars/main.yml`
 
 ```yaml
+opencov_gitea_enabled: "true"
+opencov_gitea_url: "https://git.oboroworks.com"
+opencov_gitea_token: "{{ opencov_gitea_token_secret }}"
 opencov_github_enabled: "true"
 opencov_github_token: "{{ opencov_github_token_secret }}"
 ```
 
 #### 6. Modify: `.github/workflows/deploy.yml`
 
-Add secret passthrough:
+Add secret passthrough for both:
 
 ```
+-e "opencov_gitea_token_secret=${{ secrets.OPENCOV_GITEA_TOKEN }}" \
 -e "opencov_github_token_secret=${{ secrets.OPENCOV_GITHUB_TOKEN }}" \
 ```
 
-#### 7. GitHub Actions secret
+#### 7. GitHub Actions secrets
 
-Create `OPENCOV_GITHUB_TOKEN` — PAT with `repo:status` scope.
+- Create `OPENCOV_GITEA_TOKEN` — Gitea API token with repo status permissions.
+- Create `OPENCOV_GITHUB_TOKEN` — GitHub PAT with `repo:status` scope.
 
 #### 8. Modify: `README.md`
 
-Add `OPENCOV_GITHUB_TOKEN` to the secrets table.
+Add `OPENCOV_GITEA_TOKEN` and `OPENCOV_GITHUB_TOKEN` to the secrets table.
 
 ## What's NOT needed
 
