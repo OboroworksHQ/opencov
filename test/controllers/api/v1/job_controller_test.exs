@@ -38,6 +38,33 @@ defmodule Opencov.Api.V1.JobControllerTest do
     assert job.files_count == Enum.count(data["source_files"])
   end
 
+  test "creates job with files that have no source (coveralls python format)", %{conn: conn} do
+    project = insert(:project)
+    data = %{
+      "repo_token" => project.token,
+      "service_name" => "github-actions",
+      "source_files" => [
+        %{"name" => "app/__init__.py", "coverage" => []},
+        %{"name" => "app/main.py", "source_digest" => "abc123", "coverage" => [nil, 1, 0, nil]},
+        %{"name" => "app/utils.py", "source" => nil, "coverage" => [1, 1, 1]},
+        %{"name" => "app/core.py", "source" => "x = 1", "coverage" => [1]}
+      ],
+      "git" => %{
+        "head" => %{"id" => "abc123sourceless", "message" => "test"},
+        "branch" => "main"
+      }
+    }
+    payload = Jason.encode!(%{json: Jason.encode!(data)})
+    conn = post conn, api_v1_job_path(conn, :create), payload
+    assert json_response(conn, 200)
+
+    build = Opencov.Build.for_commit(project, data["git"]) |> Opencov.Repo.first
+    assert build
+    job = List.first(Opencov.Repo.preload(build, jobs: :files).jobs)
+    assert job.files_count == 4
+    assert length(job.files) == 4
+  end
+
   test "works with multipart data", %{conn: conn} do
     project = insert(:project)
     data = Map.put(Opencov.Fixtures.dummy_coverage, "repo_token", project.token)
