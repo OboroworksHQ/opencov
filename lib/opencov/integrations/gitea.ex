@@ -55,8 +55,8 @@ defmodule Opencov.Integrations.Gitea do
     gitea_host = URI.parse(gitea_url).host
     uri = URI.parse(base_url)
 
-    if uri.host == gitea_host do
-      parts = uri.path |> String.trim_leading("/") |> String.trim_trailing(".git") |> String.split("/")
+    if uri.host && gitea_host && uri.host == gitea_host do
+      parts = (uri.path || "") |> String.trim_leading("/") |> String.trim_trailing(".git") |> String.split("/")
       case parts do
         [owner, repo | _] when byte_size(owner) > 0 and byte_size(repo) > 0 -> {:ok, owner, repo}
         _ -> :error

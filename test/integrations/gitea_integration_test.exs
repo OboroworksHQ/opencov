@@ -93,15 +93,21 @@ defmodule Opencov.Integrations.GiteaIntegrationTest do
       project: project,
       commit_sha: "abc123def456",
       branch: "feature-branch",
-      coverage: 85.5,
-      previous_coverage: 80.0,
       service_job_pull_request: pr
     )
 
-    job = insert(:job, build: build, coverage: 85.5)
+    job = insert(:job, build: build)
+
+    # Update coverage directly in DB
+    import Ecto.Query
+    from(b in Opencov.Build, where: b.id == ^build.id)
+    |> Repo.update_all(set: [coverage: 85.5, previous_coverage: 80.0])
+    from(j in Opencov.Job, where: j.id == ^job.id)
+    |> Repo.update_all(set: [coverage: 85.5])
 
     file = %Opencov.File{
       name: "lib/app.ex",
+      source: "defmodule App do\nend",
       coverage: 90.0,
       previous_coverage: 95.0,
       coverage_lines: [1, 1, 0, nil, 1, 1, 1, 1, 1, 1],
@@ -111,6 +117,7 @@ defmodule Opencov.Integrations.GiteaIntegrationTest do
 
     file2 = %Opencov.File{
       name: "lib/new.ex",
+      source: "defmodule New do\nend",
       coverage: 80.0,
       previous_coverage: nil,
       coverage_lines: [1, 1, 1, 1, 0, nil, nil],

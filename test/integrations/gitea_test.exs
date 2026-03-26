@@ -198,11 +198,8 @@ defmodule Opencov.Integrations.GiteaTest do
       assert result =~ "Build 4"  # previous build
       assert result =~ "+5.5%"  # delta
 
-      # Should NOT include new file in reduction table
-      refute result =~ "lib/new.ex" |> String.replace("/", "") |> then(fn _ ->
-        # new.ex has no previous_coverage so shouldn't be in reduction table
-        result =~ "| [lib/new.ex]"
-      end)
+      # new.ex has no previous_coverage so shouldn't be in the reduction table
+      refute result =~ "| [lib/new.ex]"
     end
 
     test "handles build with no previous build" do
