@@ -3,12 +3,13 @@ defmodule Opencov.FileManager do
   import Opencov.File
   alias Opencov.File
 
-  @required_fields ~w(name source coverage_lines)a
+  @required_fields ~w(name coverage_lines)a
+  @optional_fields_extra ~w(source)a
   @optional_fields ~w(job_id)a
 
   def changeset(model, params \\ :invalid) do
     model
-    |> cast(normalize_params(params), @required_fields ++ @optional_fields)
+    |> cast(normalize_params(params), @required_fields ++ @optional_fields ++ @optional_fields_extra)
     |> validate_required(@required_fields)
     |> generate_coverage
     |> prepare_changes(&set_previous_file/1)
