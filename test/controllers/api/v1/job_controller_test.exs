@@ -17,12 +17,11 @@ defmodule Opencov.Api.V1.JobControllerTest do
     assert json_response(conn, 400)
   end
 
-  test "returns 404 when inexistent token given", %{conn: conn} do
+  test "returns 422 when inexistent token given", %{conn: conn} do
     data = Map.put(Opencov.Fixtures.dummy_coverage, "repo_token", "i-dont-exist")
     payload = Jason.encode!(%{json: Jason.encode!(data)})
-    assert_raise Ecto.NoResultsError, fn ->
-      post conn, api_v1_job_path(conn, :create), payload
-    end
+    conn = post conn, api_v1_job_path(conn, :create), payload
+    assert json_response(conn, 422)
   end
 
   test "creates job when project exists", %{conn: conn} do

@@ -21,7 +21,11 @@ defmodule Opencov.FileManager do
   defp normalize_params(params), do: default_source(params)
 
   defp default_source(%{"source" => source} = params) when is_binary(source) and byte_size(source) > 0, do: params
-  defp default_source(params), do: Map.put(params, "source", "(no source)")
+  defp default_source(%{source: source} = params) when is_binary(source) and byte_size(source) > 0, do: params
+  defp default_source(%{} = params) do
+    key = if Map.has_key?(params, :name), do: :source, else: "source"
+    Map.put(params, key, "(no source)")
+  end
 
   defp generate_coverage(changeset) do
     case get_change(changeset, :coverage_lines) do

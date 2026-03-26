@@ -67,7 +67,7 @@ defmodule Opencov.FileTest do
   # --- coverage computation ---
 
   test "compute_coverage with mixed lines" do
-    assert File.compute_coverage([0, 1, nil, 0, 2, 1]) == 75.0
+    assert File.compute_coverage([0, 1, nil, 0, 2, 1]) == 60.0
   end
 
   test "compute_coverage with empty list" do

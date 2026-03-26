@@ -63,7 +63,15 @@ defmodule Opencov.Build do
 
   def normalize_params(params) when is_map(params) do
     {git_info, params} = Map.pop(params, "git")
+    params = map_coveralls_fields(params)
     Map.merge(params, git_params(git_info))
+  end
+
+  defp map_coveralls_fields(params) do
+    case Map.pop(params, "service_pull_request") do
+      {nil, params} -> params
+      {pr, params} -> Map.put_new(params, "service_job_pull_request", pr)
+    end
   end
   def normalize_params(params), do: params
 

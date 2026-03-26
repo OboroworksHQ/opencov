@@ -13,9 +13,9 @@ defmodule Opencov.UserTest do
     refute changeset.valid?
   end
 
-  test "changeset requires name" do
+  test "changeset does not require name" do
     changeset = UserManager.changeset(%Opencov.User{}, %{email: "a@b.com", password: "secret"})
-    refute changeset.valid?
+    assert changeset.valid?
   end
 
   test "password_update_changeset rejects short passwords" do

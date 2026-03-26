@@ -50,12 +50,13 @@ defmodule Opencov.Integrations.Gitea do
     end
   end
 
-  defp parse_repo(base_url, gitea_url) when is_binary(base_url) and is_binary(gitea_url) do
+  @doc false
+  def parse_repo(base_url, gitea_url) when is_binary(base_url) and is_binary(gitea_url) do
     gitea_host = URI.parse(gitea_url).host
     uri = URI.parse(base_url)
 
-    if uri.host == gitea_host do
-      parts = uri.path |> String.trim_leading("/") |> String.trim_trailing(".git") |> String.split("/")
+    if uri.host && gitea_host && uri.host == gitea_host do
+      parts = (uri.path || "") |> String.trim_leading("/") |> String.trim_trailing(".git") |> String.split("/")
       case parts do
         [owner, repo | _] when byte_size(owner) > 0 and byte_size(repo) > 0 -> {:ok, owner, repo}
         _ -> :error
@@ -64,7 +65,7 @@ defmodule Opencov.Integrations.Gitea do
       :error
     end
   end
-  defp parse_repo(_, _), do: :error
+  def parse_repo(_, _), do: :error
 
   # --- Commit Status ---
 
@@ -132,7 +133,8 @@ defmodule Opencov.Integrations.Gitea do
 
   # --- Comment Formatting ---
 
-  defp format_pr_comment(build) do
+  @doc false
+  def format_pr_comment(build) do
     all_files = build.jobs |> Enum.flat_map(& &1.files)
 
     if Enum.empty?(all_files) do
@@ -226,12 +228,14 @@ defmodule Opencov.Integrations.Gitea do
 
   # --- Helpers ---
 
-  defp format_pct(nil), do: "0%"
-  defp format_pct(coverage) do
+  @doc false
+  def format_pct(nil), do: "0%"
+  def format_pct(coverage) do
     "#{Float.round(coverage, 2)}%"
   end
 
-  defp format_delta(build) do
+  @doc false
+  def format_delta(build) do
     if build.previous_coverage do
       delta = Float.round(build.coverage - build.previous_coverage, 1)
       sign = if delta >= 0, do: "+", else: ""
@@ -241,7 +245,8 @@ defmodule Opencov.Integrations.Gitea do
     end
   end
 
-  defp delta_direction(build) do
+  @doc false
+  def delta_direction(build) do
     if build.previous_coverage do
       if build.coverage >= build.previous_coverage, do: "increased", else: "decreased"
     else

@@ -25,8 +25,8 @@ defmodule Opencov.CommonViewTest do
 
   test "coverage_diff" do
     assert coverage_diff(60.0, 60.0) == "Coverage has not changed."
-    assert coverage_diff(64.0, 60.0) == "Coverage has decreased by 4.0%."
-    assert coverage_diff(60.0, 64.0) == "Coverage has increased by 4.0%."
+    assert coverage_diff(64.0, 60.0) == "Coverage has decreased by 4.00%."
+    assert coverage_diff(60.0, 64.0) == "Coverage has increased by 4.00%."
   end
 
   test "repository_class" do

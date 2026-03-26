@@ -15,8 +15,7 @@ defmodule Opencov.SettingsTest do
     changeset = SettingsManager.changeset(%Opencov.Settings{}, %{
       default_project_visibility: "invalid_value"
     })
-    # Settings doesn't validate visibility values at changeset level
-    assert changeset.valid?
+    refute changeset.valid?
   end
 
   test "default values" do
