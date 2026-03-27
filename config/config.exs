@@ -9,7 +9,7 @@ config :opencov, Opencov.Endpoint,
 
 config :opencov,
   badge_format: "svg",
-  base_url: nil,
+  base_url: System.get_env("OPENCOV_BASE_URL"),
   ecto_repos: [Opencov.Repo]
 
 config :logger, :console,
