@@ -54,6 +54,12 @@ config :opencov, :gitea,
   post_commit_status: true,
   post_pr_comment: true
 
+config :opencov, :github,
+  enabled: System.get_env("GITHUB_ENABLED") == "true",
+  token: System.get_env("GITHUB_TOKEN"),
+  post_commit_status: true,
+  post_pr_comment: true
+
 import_config "#{Mix.env}.exs"
 
 local_config_path = Path.expand("local.exs", __DIR__)
